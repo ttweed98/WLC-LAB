@@ -1,0 +1,10 @@
+---
+- name: "Printing Some Var Info"
+  hosts: wlc
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Displaying var stuff"
+      debug:
+        msg: "{{ hostvars[ansible_host] }}"

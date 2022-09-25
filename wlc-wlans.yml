@@ -1,0 +1,10 @@
+---
+- name: "Creating Wireless LANs"
+  hosts: wlc
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Adding wireless wlans to WLC"
+      cisco.ios.ios_config:
+        src: "ssid.j2"

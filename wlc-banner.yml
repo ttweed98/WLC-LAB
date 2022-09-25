@@ -1,0 +1,21 @@
+---
+- name: "WLC Banner Playboo"
+  hosts: wlc
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Configure Login Banner"
+      cisco.ios.ios_banner:
+        banner: login
+        text: |
+          ##########################################################################
+          # Unauthorized access of this device or any information or data received #
+          # or sent by this device is prohibited. This device is monitored and per #
+          # Koch Industries Electronic Communications Acceptable Usage Policy,     #
+          # results can be used for any legal purpose.                             #
+          ##########################################################################
+        state: present
+      register: my_banner
+
+    - debug: var=my_banner

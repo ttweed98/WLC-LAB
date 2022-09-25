@@ -1,0 +1,14 @@
+---
+- name: "WLC Show Commands test"
+  hosts: wlc
+  gather_facts: false
+  connection: network_cli
+  tasks:
+    - name: "Send commands to the WLC for testing"
+      cisco.ios.ios_command:
+        commands:
+          - show wireless detail
+          - show wlan all
+          - sh ip interface brief
+      register: output
+    - debug: var=output['stdout_lines']
