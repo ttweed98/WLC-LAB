@@ -8,3 +8,8 @@
     - name: "Adding wireless wlans to WLC"
       cisco.ios.ios_config:
         src: "ssid.j2"
+      register: output
+
+    - name: "Print output"
+      debug:
+        msg: "{{ output }}"

@@ -1,6 +1,6 @@
 ---
 - name: "NTP Config Playbook"
-  hosts: usa
+  hosts: wlc
   gather_facts: false
   connection: network_cli
 

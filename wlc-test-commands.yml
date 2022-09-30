@@ -1,0 +1,15 @@
+---
+- name: "Testing response commands"
+  hosts: wlc
+  connection: network_cli
+
+  tasks:
+    - name: run command expecting user confirmation
+      cli_command:
+        command: "{{ item }}"
+        prompt:
+          - "Are you sure you want to do this"
+        answer: "y"
+      loop:
+        - conf t
+        - ap dot11 24ghz shutdown

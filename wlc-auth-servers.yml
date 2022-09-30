@@ -1,0 +1,15 @@
+---
+
+- name: "Playbook to create Radius and Tacacs servers"
+  hosts: wlc 
+  connection: network_cli
+
+  tasks: 
+    - name: "Push Radius and Tacacs configs via jijna2"
+      cisco.ios.ios_config:
+        src: "auth-servers.j2"
+      register: result 
+    
+    - name: "Print config results"
+      debug: 
+        msg: "{{ result }}"
