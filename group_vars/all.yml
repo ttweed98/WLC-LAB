@@ -1,3 +1,6 @@
 ansible_user: "tony"
 ansible_password: "cisco"
 ansible_network_os: ios
+ansible_become: yes
+ansible_become_method: enable
+ansible_become_password: "cisco"

@@ -1,0 +1,9 @@
+{% for vl in std_vlans.vlan %}
+vlan {{ vl.number}}
+name {{ vl.name }}
+interface vlan {{ vl.number }}
+ip address {{ vl.svi }}
+no shutdown
+exit
+{% endfor %}
+ip route 0.0.0.0 0.0.0.0 {{gateway.ips.wireless}}

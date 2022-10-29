@@ -1,0 +1,8 @@
+---
+- name: "Test vlans"
+  hosts: wlc
+  connection: network_cli
+
+  tasks:
+    - name: "Testing host variables"
+      template: src=std-vlans.j2 dest=wlc.conf

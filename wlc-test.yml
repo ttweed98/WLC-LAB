@@ -1,0 +1,26 @@
+---
+- name: "Run test configs to WLC"
+  hosts: wlc
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Push part of config file to wlc"
+      cisco.ios.ios_config:
+        src: "wlc-config1.txt"
+      register: output
+
+    - name: "Testing host variables"
+      cisco.ios.ios_config:
+        src: "std-vlans.j2"
+      register: output2
+    
+    - name: "Print Results"
+      debug:
+        msg:
+        - "{{ output }}"
+        - "{{ output2 }}"
+
+      
+    
+ 

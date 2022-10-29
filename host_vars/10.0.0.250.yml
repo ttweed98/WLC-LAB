@@ -93,3 +93,6 @@ Tacacs:
     - server: "MLXLILRADPSN01"
       ip: "10.1.38.101"
       key: "32v51K4BSQskAXWKg1pA"
+
+gateway:
+  ips: 10.59.125.1
