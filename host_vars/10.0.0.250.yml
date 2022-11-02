@@ -7,15 +7,15 @@ wireless:
 
 wlan:
   - profile: "Business"
-    id: "3"
+    id: "1"
     ssid: "Business"
 
   - profile: "Koch-Guest"
-    id: "4"
+    id: "2"
     ssid: "Koch-Guest"
 
   - profile: "Koch-Personal"
-    id: "5"
+    id: "3"
     ssid: "Koch-Personal"
 
 std_vlans:
@@ -31,6 +31,10 @@ std_vlans:
     - number: 334
       name: "334-HIOT"
       svi: "172.18.16.3 255.255.255.0"
+    
+    - number: 999
+      name: "Sinkhole"
+      svi: "198.51.100.2 255.255.255.0"
 
 vlans:
   vlan:
@@ -82,7 +86,7 @@ Radius:
 
     - server: "MLXLILRADPSN01"
       ip: "10.1.38.101"
-      key: "10.1.38.101"
+      key: "153R@d!u$KBSLP"
 
 Tacacs:
   servers:
@@ -94,5 +98,17 @@ Tacacs:
       ip: "10.1.38.101"
       key: "32v51K4BSQskAXWKg1pA"
 
-gateway:
-  ips: 10.59.125.1
+interfaces:
+  - interface: "G2"
+    name:  "{{remote_hostname}}-G1/0/20"
+    mode: "trunk"
+
+  - interface: "G3"
+    name:  "{{remote_hostname}}-G2/0/20"
+    mode: "trunk"
+
+site_code: "MLXELI"
+gateway: "10.59.125.1"
+hostname: "MLXELI-WLC01"
+remote_hostname: "MLXELI-RXA1"
+wlan_mgmt_intf: "901"

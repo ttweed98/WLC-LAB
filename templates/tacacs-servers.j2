@@ -1,0 +1,26 @@
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization console
+aaa authorization exec default group tacacs+ local if-authenticated
+aaa authorization network default group tacacs+
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+{% for srv in Tacacs.servers %}
+tacacs server {{ srv.server }}
+address ipv4 {{ srv.ip }}
+key 0 {{ srv.key }}
+{% endfor %}
+aaa group server tacacs+ ISE
+{% for group in Tacacs.servers %}
+server name {{ group.server }}
+{% endfor %}
+aaa authentication login ISE1 group ISE
+aaa authorization exec ISE2 group ISE
+no tacacs-server directed-request
+ip tacacs source-interface vlan {{ wlan_mgmt_intf }}
+ip http authentication aaa login-authentication ISE1
+ip http authentication aaa exec-authorization ISE2
+ip http timeout-policy idle 600 life 86400 requests 86400
+ip http secure-server
+no ip http server

@@ -19,3 +19,6 @@ service password-encryption
 !
 ip http authentication local
 !
+interface vlan 1
+ shutdown
+!

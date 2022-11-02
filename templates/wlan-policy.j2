@@ -1,0 +1,11 @@
+wireless mobility group name {{ hostname }}
+!
+{% for pol in wireless.profile %}
+wireless profile policy {{ pol.policy }}
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!
+{% endfor %}

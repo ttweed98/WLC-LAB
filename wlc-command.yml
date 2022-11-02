@@ -1,0 +1,14 @@
+---
+- name: "Test"
+  hosts: wlc
+  connection: network_cli
+
+  tasks:
+    - name: "Testing prompt"
+      cisco.ios.ios_config:
+        lines: 
+          - wireless mobility group name {{ hostname }}
+      
+      
+
+

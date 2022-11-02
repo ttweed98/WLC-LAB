@@ -4,10 +4,16 @@
   connection: network_cli
 
   tasks:
-    - name: "Test vars"
-      cisco.ios.ios_config:
-        lines:
-          - ip route 0.0.0.0 0.0.0.0 "{{gateway.ips}}"
+    - name: 
+      cisco.ios.ios_static_routes:
+        config:
+        - address_families:
+          - afi: ipv4
+            routes:
+            - dest: 0.0.0.0 0.0.0.0
+              next_hops:
+              - forward_router_address: "{{ gateway }}"
+      register: output
 
     - name: "Print Test"
       debug:

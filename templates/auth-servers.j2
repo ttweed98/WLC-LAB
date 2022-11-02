@@ -1,0 +1,20 @@
+aaa new-model
+radius-server dead-criteria time 15 tries 3
+radius-server deadtime 10
+radius-server load-balance method least-outstanding
+{% for srv in Radius.servers %}
+radius server {{ srv.server}}
+address ipv4 {{ srv.ip }} auth-port 1812 acct-port 1813
+key 0 {{ srv.key }}
+{% endfor %}
+aaa group server radius PROD
+{% for aaasrv in Radius.servers %}
+server name {{ aaasrv.server}}
+{% endfor %}
+aaa group server radius Web-auth
+{% for aaasrv in Radius.servers %}
+server name {{ aaasrv.server}}
+{% endfor %}
+aaa authentication dot1x CWA group Web-Auth
+aaa authorization network CWA group Web-Auth
+aaa authentication dot1x Business_802.1x group PROD

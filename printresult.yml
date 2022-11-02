@@ -5,4 +5,7 @@
 
   tasks:
     - name: "Testing host variables"
-      template: src=std-vlans.j2 dest=wlc.conf
+      template: src=wlan-policy.j2 dest=wlc.txt
+
+
+

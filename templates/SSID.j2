@@ -1,0 +1,35 @@
+{% for wlans in wlan %}
+{% if wlans.profile == "Business" %}
+wlan {{ wlans.profile }} {{ wlans.id }} {{ wlans.ssid }}
+no chd
+security dot1x authentication-list Business_802.1x
+no shutdown
+exit
+{% else %}
+wlan {{ wlans.profile }} {{ wlans.id }} {{ wlans.ssid }}
+mac-filtering CWA
+no security wpa
+no security wpa wpa2 ciphers aes
+no security wpa akm dot1x
+security dot1x authentication-list CWA
+no shutdown
+exit
+{% endif %}
+{% endfor %}
+{% for wlans in wlan %}
+{% if wlans.profile == "Business" %}
+wireless tag policy {{ site_code }}-Tag
+wlan {{ wlans.profile }} policy Client_Policy
+exit
+{% endif %}
+{% if wlans.profile == "Koch-Guest" %}
+wireless tag policy {{ site_code }}-Tag
+wlan {{ wlans.profile }} policy Guest_Web_Auth
+exit
+{% endif %}
+{% if wlans.profile == "Koch-Personal" %}
+wireless tag policy {{ site_code }}-Tag
+wlan {{ wlans.profile }} policy Personal_Web_Auth
+exi
+{% endif %}
+{% endfor %}
