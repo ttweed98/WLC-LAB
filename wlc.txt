@@ -1,4 +1,5 @@
 wireless mobility group name MLXELI-WLC01
+y
 !
 wireless profile policy Guest_Web_Auth
 ipv4 dhcp required

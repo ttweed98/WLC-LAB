@@ -107,6 +107,19 @@ interfaces:
     name:  "{{remote_hostname}}-G2/0/20"
     mode: "trunk"
 
+snmp:
+  groups:
+    - group: kgsnetworkteam
+      auth_pwd:
+    - group: kgsnetworkwr
+      auth_pwd: 
+      priv_pwd:
+    - group: cxgroup
+      auth_pwd:
+      priv_pwd:
+  location: 
+    
+
 site_code: "MLXELI"
 gateway: "10.59.125.1"
 hostname: "MLXELI-WLC01"
