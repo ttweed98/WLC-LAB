@@ -1,11 +1,12 @@
 ---
 - name: "Test vlans"
   hosts: wlc
+
   connection: network_cli
 
   tasks:
     - name: "Testing host variables"
-      template: src=snmp.j2 dest=snmp.txt
+      template: src=brestricted-vlans.j2 dest=brvlans.txt
 
 
 

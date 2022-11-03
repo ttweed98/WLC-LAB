@@ -1,6 +1,3 @@
-*******************************
-Controller 1
-*******************************
 ap dot11 24ghz shutdown
 y
 ap dot11 5ghz shutdown
@@ -10,6 +7,7 @@ y
 no ap dot11 24ghz shutdown
 no ap dot11 5ghz shutdown
 !
+
 interface GigabitEthernet3
  vrf forwarding Mgmt-intf
  ip address dhcp
@@ -17,7 +15,6 @@ interface GigabitEthernet3
 no shut
 !
 username admin privilege 15 secret 5 $1$X46V$6KOYtMR68l1q2CE/..KvJ1
-enable secret 5 $1$X46V$6KOYtMR68l1q2CE/..KvJ1
 !
 aaa new-model
 aaa authentication enable default none

@@ -1,4 +1,8 @@
-interface
+hostname MLXELI-WLC01
+ntp server 10.1.10.13
+ntp server 10.159.12.29
+ntp source vlan 901
+
 vlan 901
 name Wireless_Management
 interface vlan 901
@@ -14,7 +18,7 @@ exit
 vlan 334
 name 334-HIOT
 interface vlan 334
-ip address 172.18.16.3 255.255.255.0
+ip address 172.18.16.3 255.255.240.0
 no shutdown
 exit
 vlan 999
@@ -28,6 +32,10 @@ interface vlan 999
 description bogon non-routeable
 exit
 ip route 0.0.0.0 0.0.0.0 10.59.125.1
+interface vlan 1
+shutdown
+exit
+wireless management interface vlan 901
 
 interface G2
 description MLXELI-RXA1-G1/0/20

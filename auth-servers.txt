@@ -1,0 +1,19 @@
+aaa new-model
+radius-server dead-criteria time 15 tries 3
+radius-server deadtime 10
+radius-server load-balance method least-outstanding
+radius server MLXETTRADPSN1
+address ipv4 10.244.13.9 auth-port 1812 acct-port 1813
+key 0 153R@d!u$KBSLP
+radius server MLXLILRADPSN01
+address ipv4 10.1.38.101 auth-port 1812 acct-port 1813
+key 0 153R@d!u$KBSLP
+aaa group server radius PROD
+server name MLXETTRADPSN1
+server name MLXLILRADPSN01
+aaa group server radius Web-auth
+server name MLXETTRADPSN1
+server name MLXLILRADPSN01
+aaa authentication dot1x CWA group Web-Auth
+aaa authorization network CWA group Web-Auth
+aaa authentication dot1x Business_802.1x group PROD

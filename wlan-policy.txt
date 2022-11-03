@@ -1,0 +1,24 @@
+wireless mobility group name MLXELI-WLC01
+y
+!
+wireless profile policy Guest_Web_Auth
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!
+wireless profile policy KIIGuest_Web_Auth
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!
+wireless profile policy Person_Web_Auth
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!

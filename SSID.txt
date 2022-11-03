@@ -1,0 +1,30 @@
+wlan Business 1 Business
+no chd
+security dot1x authentication-list Business_802.1x
+no shutdown
+exit
+wlan Koch-Guest 2 Koch-Guest
+mac-filtering CWA
+no security wpa
+no security wpa wpa2 ciphers aes
+no security wpa akm dot1x
+security dot1x authentication-list CWA
+no shutdown
+exit
+wlan Koch-Personal 3 Koch-Personal
+mac-filtering CWA
+no security wpa
+no security wpa wpa2 ciphers aes
+no security wpa akm dot1x
+security dot1x authentication-list CWA
+no shutdown
+exit
+wireless tag policy MLXELI-Tag
+wlan Business policy Client_Policy
+exit
+wireless tag policy MLXELI-Tag
+wlan Koch-Guest policy Guest_Web_Auth
+exit
+wireless tag policy MLXELI-Tag
+wlan Koch-Personal policy Personal_Web_Auth
+exi

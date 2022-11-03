@@ -1,3 +1,12 @@
+ap dot11 24ghz shutdown
+y
+ap dot11 5ghz shutdown
+y
+ap country US
+y
+no ap dot11 24ghz shutdown
+no ap dot11 5ghz shutdown
+
 vrf definition Mgmt-intf 
 !
 interface GigabitEthernet3

@@ -15,7 +15,7 @@ access-list 31 permit 10.0.0.0 0.255.255.255
 access-list 31 permit 146.209.0.0 0.0.255.255
 {% endif %}
 {% if srv.group == "cxgroup" %}
-snm--server group {{ srv.group }} v3 priv
+snmp-server group {{ srv.group }} v3 priv
 snmp-server group {{ srv.group }} v3 priv read v1default  
 snmp-server user mlxuser {{ srv.group}} v3 auth sha {{ srv.auth_pwd}} priv aes 128 {{ srv.priv_pwd}}
 {% endif %}

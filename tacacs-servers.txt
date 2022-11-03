@@ -7,21 +7,22 @@ aaa authorization network default group tacacs+
 aaa accounting exec default start-stop group tacacs+
 aaa accounting commands 15 default start-stop group tacacs+
 !
-{% for srv in Tacacs.servers %}
-tacacs server {{ srv.server }}
-address ipv4 {{ srv.ip }}
-key 0 {{ srv.key }}
+tacacs server MLXETTRADPSN1
+address ipv4 10.224.13.9
+key 0 32v51K4BSQskAXWKg1pA
 !
-{% endfor %}
+tacacs server MLXLILRADPSN01
+address ipv4 10.1.38.101
+key 0 32v51K4BSQskAXWKg1pA
+!
 aaa group server tacacs+ ISE
-{% for group in Tacacs.servers %}
-server name {{ group.server }}
-{% endfor %}
+server name MLXETTRADPSN1
+server name MLXLILRADPSN01
 !
 aaa authentication login ISE1 group ISE
 aaa authorization exec ISE2 group ISE
 no tacacs-server directed-request
-ip tacacs source-interface vlan {{ wlan_mgmt_intf }}
+ip tacacs source-interface vlan 901
 !
 ip http authentication aaa login-authentication ISE1
 ip http authentication aaa exec-authorization ISE2

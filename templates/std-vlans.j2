@@ -1,4 +1,8 @@
-interface
+hostname {{ site_code }}-WLC{{ WLC_number }}
+ntp server 10.1.10.13
+ntp server 10.159.12.29
+ntp source vlan {{ wlan_mgmt_intf }}
+
 {% for vl in std_vlans.vlan %}
 vlan {{ vl.number}}
 name {{ vl.name }}
@@ -12,6 +16,10 @@ interface vlan 999
 description bogon non-routeable
 exit
 ip route 0.0.0.0 0.0.0.0 {{ gateway }}
+interface vlan 1
+shutdown
+exit
+wireless management interface vlan {{ wlan_mgmt_intf }}
 
 {% for intf in interfaces %}
 interface {{ intf.interface }}

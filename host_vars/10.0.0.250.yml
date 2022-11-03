@@ -30,13 +30,13 @@ std_vlans:
 
     - number: 334
       name: "334-HIOT"
-      svi: "172.18.16.3 255.255.255.0"
+      svi: "172.18.16.3 255.255.240.0"
     
     - number: 999
       name: "Sinkhole"
       svi: "198.51.100.2 255.255.255.0"
 
-vlans:
+b_restricted_vlans:
   vlan:
     - number: 893
       name: "893-MLXIOT"
@@ -109,13 +109,13 @@ interfaces:
 
 snmp:
   groups:
-    - group: kgsnetworkteam
+    - group: "kgsnetworkteam"
       auth_pwd: vnIXW5wuV_yX
       priv_pwd: jwH_BUDjKYE2
-    - group: kgsnetwork
+    - group: "kgsnetwork"
       auth_pwd: JEaVDNvNqTI_1
       priv_pwd: AgnTcgObdZ_N4
-    - group: cxgroup
+    - group: "cxgroup"
       auth_pwd: 6XWdvAFmPMZ_Gz
       priv_pwd: PgwWh_XwEX7VyX
   location: Guadalajara, MX;  Main Data Center
@@ -133,3 +133,5 @@ gateway: "10.59.125.1"
 hostname: "MLXELI-WLC01"
 remote_hostname: "MLXELI-RXA1"
 wlan_mgmt_intf: "901"
+Client_Vlan: "100"
+WLC_number: "01"

@@ -1,5 +1,3 @@
-wireless management interface vlan 901
-!
 wireless profile policy Client_Policy
  vlan Client_Vlan
  no shutdown
@@ -29,7 +27,7 @@ ap dot11 24ghz rf-profile Modified_DR_24
  tx-power max 14
  tx-power min 8
  no shutdown
-
+!
 ap dot11 5ghz rf-profile Modified_DR_5
  description "Standard RF profile with lower data rates removed"
 channel chan-width 20

@@ -1,0 +1,31 @@
+aaa authentication dot1x Business-Restricted group PROD
+aaa authorization network Business-Restricted group PROD
+!
+{% for vl in b_restricted_vlans.vlan %}
+vlan {{ vl.number}}
+name {{ vl.name }}
+!
+interface vlan {{ vl.number }}
+ip address {{ vl.svi }}
+no shutdown
+!
+exit
+{% endfor %}
+vlan group 000-Busiess vlan-list {{ Client_Vlan }}
+!
+!
+wlan Business-Restricted 4 Business-Restricted
+ mac-filtering Business-Restricted
+ security wpa psk set-key ascii 0 idontdfsofjodfsoidoif
+ no security wpa akm dot1x
+ security wpa akm psk
+ security dot1x authentication-list Business-Restricted
+ no shutdown
+!
+wireless profile policy Business-Restricted
+ aaa-override
+ vlan Sinkhole
+ no shutdown
+!
+wireless tag policy {{ site_code }}-Tag
+ wlan Business-Restricted policy Business-Restricted
