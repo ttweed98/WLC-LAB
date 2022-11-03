@@ -1,0 +1,18 @@
+
+snmp-server location Guadalajara, MX;  Main Data Center
+snmp-server contact KBS-Network Operations
+snmp-server group kgsnetworkteam v3 priv
+snmp-server group kgsnetworkteam v3 priv read v1default 
+snmp-server user kgsuser  kgsnetworkteam v3 auth sha vnIXW5wuV_yX priv aes 128 vnIXW5wuV_yX
+snmp-server group kgsnetworkteam v3 priv read v1default  
+snmp-server user mlxuser kgsnetworkteam v3 auth sha vnIXW5wuV_yX priv aes 128 jwH_BUDjKYE2
+snmp-server group kgsnetwork v3 priv
+snmp-server group kgsnetworkwr v3 priv write v1default  access 31
+snmp-server user kgswruser  kgsnetworkwr v3 auth sha JEaVDNvNqTI_1 priv aes 128 AgnTcgObdZ_N4
+access-list 31 permit 10.0.0.0 0.255.255.255
+access-list 31 permit 146.209.0.0 0.0.255.255
+snmp-server group cxgroup v3 priv read v1default  
+snmp-server user mlxuser cxgroup v3 auth sha 6XWdvAFmPMZ_Gz priv aes 128 PgwWh_XwEX7VyX
+
+
+

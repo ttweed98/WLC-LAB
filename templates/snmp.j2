@@ -1,0 +1,29 @@
+
+snmp-server location {{ snmp.location }}
+snmp-server contact KBS-Network Operations
+{% for srv in snmp.groups %}
+{% if srv.group == "kgsnetworkteam"%}
+snmp-server group {{ srv.group }} v3 priv
+snmp-server group kgsnetworkteam v3 priv read v1default 
+snmp-server user kgsuser  kgsnetworkteam v3 auth sha {{ srv.auth_pwd }} priv aes 128 {{srv.auth_pwd}}
+{% endif %}
+{%if srv.group == "kgsnetwork"%}
+snmp-server group {{ srv.group }} v3 priv
+snmp-server group {{ srv.group }}wr v3 priv write v1default  access 31
+snmp-server user kgswruser  {{ srv.group }}wr v3 auth sha {{ srv.auth_pwd }} priv aes 128 {{ srv.priv_pwd }}
+access-list 31 permit 10.0.0.0 0.255.255.255
+access-list 31 permit 146.209.0.0 0.0.255.255
+{% else %}
+snm--server group {{ srv.group }} v3 priv
+snmp-server group {{ srv.group }} v3 priv read v1default  
+snmp-server user mlxuser {{ srv.group}} v3 auth sha {{ srv.auth_pwd}} priv aes 128 {{ srv.priv_pwd}}
+{% endif %}
+{% endfor %}
+logging origin-id hostname
+logging trap notifications
+logging host {{ logging_servers.USA }}
+logging buffered 512000
+no logging console
+
+
+

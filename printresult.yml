@@ -5,7 +5,7 @@
 
   tasks:
     - name: "Testing host variables"
-      template: src=wlan-policy.j2 dest=wlc.txt
+      template: src=snmp.j2 dest=snmp.txt
 
 
 

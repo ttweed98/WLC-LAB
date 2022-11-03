@@ -1,0 +1,44 @@
+interface
+vlan 901
+name Wireless_Management
+interface vlan 901
+ip address 10.59.125.250 255.255.255.0
+no shutdown
+exit
+vlan 100
+name Client_Vlan
+interface vlan 100
+ip address 10.59.100.3 255.255.255.0
+no shutdown
+exit
+vlan 334
+name 334-HIOT
+interface vlan 334
+ip address 172.18.16.3 255.255.255.0
+no shutdown
+exit
+vlan 999
+name Sinkhole
+interface vlan 999
+ip address 198.51.100.2 255.255.255.0
+no shutdown
+exit
+
+interface vlan 999
+description bogon non-routeable
+exit
+ip route 0.0.0.0 0.0.0.0 10.59.125.1
+
+interface G2
+description MLXELI-RXA1-G1/0/20
+switchport mode trunk
+channel-group 1 mode on
+interface G3
+description MLXELI-RXA1-G2/0/20
+switchport mode trunk
+channel-group 1 mode on
+interface po1
+description PortChannel to MLXELI-RXA1
+switchport mode trunk
+switchport nonegotiate
+exit

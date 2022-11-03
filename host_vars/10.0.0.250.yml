@@ -110,14 +110,22 @@ interfaces:
 snmp:
   groups:
     - group: kgsnetworkteam
-      auth_pwd:
-    - group: kgsnetworkwr
-      auth_pwd: 
-      priv_pwd:
+      auth_pwd: vnIXW5wuV_yX
+      priv_pwd: jwH_BUDjKYE2
+    - group: kgsnetwork
+      auth_pwd: JEaVDNvNqTI_1
+      priv_pwd: AgnTcgObdZ_N4
     - group: cxgroup
-      auth_pwd:
-      priv_pwd:
-  location: 
+      auth_pwd: 6XWdvAFmPMZ_Gz
+      priv_pwd: PgwWh_XwEX7VyX
+  location: Guadalajara, MX;  Main Data Center
+
+logging_servers:
+  USA: 10.222.255.14
+  EUR: 10.222.255.14
+  Japan: 10.102.7.226
+  PMC: 10.222.0.81
+  Singapore: 10.221.255.12
     
 
 site_code: "MLXELI"

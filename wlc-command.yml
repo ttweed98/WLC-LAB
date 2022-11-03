@@ -8,6 +8,8 @@
       cisco.ios.ios_config:
         lines: 
           - wireless mobility group name {{ hostname }}
+      prompt: Are you sure you want to continue? (/n)
+          - y 
       
       
 
