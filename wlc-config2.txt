@@ -1,11 +1,12 @@
 wireless profile policy Client_Policy
- vlan Client_Vlan
- no shutdown
+
+vlan Client_Vlan
+no shutdown
 !
 !
 ip access-list extended ISE_REDIRECT
 10 deny   udp any any eq bootps log
-20 deny   udp any eq bootps any
+20 deny   udp any eq bootps any 
 30 deny   udp any any eq domain
 40 deny   udp any eq domain any
 50 deny   tcp any any eq 8443
@@ -13,6 +14,7 @@ ip access-list extended ISE_REDIRECT
 70 permit ip any any
 !
 ap dot11 24ghz rf-profile Modified_DR_24
+ shutdown
  band-select client mid-rssi -75
  band-select client rssi -75
  band-select probe-response
@@ -29,6 +31,7 @@ ap dot11 24ghz rf-profile Modified_DR_24
  no shutdown
 !
 ap dot11 5ghz rf-profile Modified_DR_5
+ shutdown
  description "Standard RF profile with lower data rates removed"
 channel chan-width 20
 no channel foreign
@@ -41,70 +44,4 @@ tx-power max 17
 tx-power min 8
 client-aware-fra
 no shutdown
-!
-wireless tag rf KGS-RF-TAG
- 24ghz-rf-policy Modified_DR_24
- 5ghz-rf-policy Modified_DR_5
- description "Standard RF Tag using optimal RF Profiles"
-!
-
-
-!
-banner login ^
-##########################################################################
-# Unauthorized access of this device or any information or data received #
-# or sent by this device is prohibited. This device is monitored and per #
-# Koch Industries Electronic Communications Acceptable Usage Policy,     #
-# results can be used for any legal purpose.                             #
-##########################################################################
-^
-!
-line con 0
- exec-timeout 60 0
- transport preferred none
- stopbits 1
-line aux 0
- exec-timeout 60 0
- transport preferred none
- stopbits 1
-line vty 0 4
- exec-timeout 60 0
- length 0
- transport preferred none
- transport input ssh
-logging synchronous
-line vty 5 15
- exec-timeout 60 0
- transport preferred none
- transport input ssh
-logging synchronous
-!
-
-
-crypto key generate rsa general-keys label CryptoKey4SSH modulus 4096
-
-
-
-ip ssh time-out 60
-ip ssh version 2
-ip ssh authentication-retries 3
-!
-clock timezone CST -6 0
-clock summer-time CSDT recurring
-!
-no service pad
-service timestamps debug datetime localtime msec
-service timestamps log datetime localtime msec
-!
-service tcp-keepalives-in
-service tcp-keepalives-out 
-LLDP Run
-archive
-software auto-upgrade enable
-!
-ip domain lookup  
-ip domain name molex.com
-ip domain lookup source-interface 901
-errdisable recovery interval 300
-errdisable recovery cause all
 !

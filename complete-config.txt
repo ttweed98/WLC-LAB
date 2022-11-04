@@ -1,0 +1,410 @@
+vrf definition Mgmt-intf 
+!
+interface GigabitEthernet3
+ no switchport
+ vrf forwarding Mgmt-intf
+ ip address dhcp
+ negotiation auto
+no shut
+!
+username admin privilege 15 secret 5 $1$X46V$6KOYtMR68l1q2CE/..KvJ1
+!
+aaa new-model
+aaa authentication enable default none
+aaa common-criteria policy KGS
+ min-length 1
+ max-length 127
+ char-changes 4
+service password-encryption
+!
+ip http authentication local
+!
+interface vlan 1
+ shutdown
+!
+hostname MLXELI-WLC01
+
+vlan 901
+name Wireless_Management
+interface vlan 901
+ip address 10.59.125.250 255.255.255.0
+no shutdown
+exit
+vlan 100
+name Client_Vlan
+interface vlan 100
+ip address 10.59.100.3 255.255.255.0
+no shutdown
+exit
+vlan 334
+name 334-HIOT
+interface vlan 334
+ip address 172.18.16.3 255.255.240.0
+no shutdown
+exit
+vlan 999
+name Sinkhole
+interface vlan 999
+ip address 198.51.100.2 255.255.255.0
+no shutdown
+exit
+
+interface vlan 999
+description bogon non-routeable
+exit
+ip route 0.0.0.0 0.0.0.0 10.59.125.1
+interface vlan 1
+shutdown
+exit
+wireless management interface vlan 901
+
+interface G2
+description MLXELI-RXA1-G1/0/20
+switchport mode trunk
+channel-group 1 mode on
+interface po1
+description PortChannel to MLXELI-RXA1
+switchport mode trunk
+switchport nonegotiate
+exit
+!
+ntp server 10.1.10.13
+ntp server 10.159.12.29
+ntp source vlan 901
+!
+wireless profile policy Client_Policy
+ vlan Client_Vlan
+ no shutdown
+!
+!
+ip access-list extended ISE_REDIRECT
+10 deny   udp any any eq bootps log
+20 deny   udp any eq bootps any
+30 deny   udp any any eq domain
+40 deny   udp any eq domain any
+50 deny   tcp any any eq 8443
+60 deny   tcp any eq 8443 any
+70 permit ip any any
+!
+ap dot11 24ghz rf-profile Modified_DR_24
+ band-select client mid-rssi -75
+ band-select client rssi -75
+ band-select probe-response
+ description "Standard 2.4GHz profile with modified data rates and RRM"
+ rate RATE_11M disable
+ rate RATE_12M mandatory
+ rate RATE_1M disable
+ rate RATE_2M disable
+ rate RATE_5_5M disable
+ rate RATE_6M disable
+ rate RATE_9M disable
+ tx-power max 14
+ tx-power min 8
+ no shutdown
+!
+ap dot11 5ghz rf-profile Modified_DR_5
+ description "Standard RF profile with lower data rates removed"
+channel chan-width 20
+no channel foreign
+channel remove 36
+channel remove 144
+rate RATE_6M disable
+rate RATE_9M disable
+rate RATE_12M mandatory
+tx-power max 17
+tx-power min 8
+client-aware-fra
+no shutdown
+!
+wireless tag rf KGS-RF-TAG
+ 24ghz-rf-policy Modified_DR_24
+ 5ghz-rf-policy Modified_DR_5
+ description "Standard RF Tag using optimal RF Profiles"
+!
+
+
+!
+banner login ^
+##########################################################################
+# Unauthorized access of this device or any information or data received #
+# or sent by this device is prohibited. This device is monitored and per #
+# Koch Industries Electronic Communications Acceptable Usage Policy,     #
+# results can be used for any legal purpose.                             #
+##########################################################################
+^
+!
+line con 0
+ exec-timeout 60 0
+ transport preferred none
+ stopbits 1
+line aux 0
+ exec-timeout 60 0
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ exec-timeout 60 0
+ length 0
+ transport preferred none
+ transport input ssh
+logging synchronous
+line vty 5 15
+ exec-timeout 60 0
+ transport preferred none
+ transport input ssh
+logging synchronous
+!
+
+
+crypto key generate rsa general-keys label CryptoKey4SSH modulus 4096
+
+
+
+ip ssh time-out 60
+ip ssh version 2
+ip ssh authentication-retries 3
+!
+clock timezone CST -6 0
+clock summer-time CSDT recurring
+!
+no service pad
+service timestamps debug datetime localtime msec
+service timestamps log datetime localtime msec
+!
+service tcp-keepalives-in
+service tcp-keepalives-out 
+LLDP Run
+archive
+software auto-upgrade enable
+!
+ip domain lookup  
+ip domain name molex.com
+ip domain lookup source-interface 901
+errdisable recovery interval 300
+errdisable recovery cause all
+!
+aaa new-model
+radius-server dead-criteria time 15 tries 3
+radius-server deadtime 10
+radius-server load-balance method least-outstanding
+radius server MLXETTRADPSN1
+address ipv4 10.244.13.9 auth-port 1812 acct-port 1813
+key 0 153R@d!u$KBSLP
+radius server MLXLILRADPSN01
+address ipv4 10.1.38.101 auth-port 1812 acct-port 1813
+key 0 153R@d!u$KBSLP
+aaa group server radius PROD
+server name MLXETTRADPSN1
+server name MLXLILRADPSN01
+aaa group server radius Web-auth
+server name MLXETTRADPSN1
+server name MLXLILRADPSN01
+aaa authentication dot1x CWA group Web-Auth
+aaa authorization network CWA group Web-Auth
+aaa authentication dot1x Business_802.1x group PROD
+!
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization console
+aaa authorization exec default group tacacs+ local if-authenticated
+aaa authorization network default group tacacs+
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+!
+tacacs server MLXETTRADPSN1
+address ipv4 10.224.13.9
+key 0 32v51K4BSQskAXWKg1pA
+!
+tacacs server MLXLILRADPSN01
+address ipv4 10.1.38.101
+key 0 32v51K4BSQskAXWKg1pA
+!
+aaa group server tacacs+ ISE
+server name MLXETTRADPSN1
+server name MLXLILRADPSN01
+!
+aaa authentication login ISE1 group ISE
+aaa authorization exec ISE2 group ISE
+no tacacs-server directed-request
+ip tacacs source-interface vlan 901
+!
+ip http authentication aaa login-authentication ISE1
+ip http authentication aaa exec-authorization ISE2
+ip http timeout-policy idle 600 life 86400 requests 86400
+ip http secure-server
+no ip http server
+!
+wireless profile policy Guest_Web_Auth
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!
+wireless profile policy KIIGuest_Web_Auth
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!
+wireless profile policy Person_Web_Auth
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!
+!
+wlan Business 1 Business
+no chd
+security dot1x authentication-list Business_802.1x
+no shutdown
+exit
+wlan Koch-Guest 2 Koch-Guest
+mac-filtering CWA
+no security wpa
+no security wpa wpa2 ciphers aes
+no security wpa akm dot1x
+security dot1x authentication-list CWA
+no shutdown
+exit
+wlan Koch-Personal 3 Koch-Personal
+mac-filtering CWA
+no security wpa
+no security wpa wpa2 ciphers aes
+no security wpa akm dot1x
+security dot1x authentication-list CWA
+no shutdown
+exit
+wireless tag policy MLXELI-Tag
+wlan Business policy Client_Policy
+exit
+wireless tag policy MLXELI-Tag
+wlan Koch-Guest policy Guest_Web_Auth
+exit
+wireless tag policy MLXELI-Tag
+wlan Koch-Personal policy Personal_Web_Auth
+exit
+!
+aaa authentication dot1x Business-Restricted group PROD
+aaa authorization network Business-Restricted group PROD
+!
+vlan 893
+name 893-MLXIOT
+!
+interface vlan 893
+ip address 172.18.6.4 255.255.255.0
+no shutdown
+!
+exit
+vlan 889
+name 889-MII-Deployment
+!
+interface vlan 889
+ip address 172.26.16.4 255.255.248.0
+no shutdown
+!
+exit
+vlan 890
+name 890-MII-Deployment
+!
+interface vlan 890
+ip address 172.26.0.4 255.255.240.0
+no shutdown
+!
+exit
+vlan 891
+name 891-Standard-Vendor-Access
+!
+interface vlan 891
+ip address 172.18.3.4 255.255.255.0
+no shutdown
+!
+exit
+vlan 877
+name 877-Plating
+!
+interface vlan 877
+ip address 172.26.42.4 255.255.254.0
+no shutdown
+!
+exit
+vlan 878
+name 878-Molding
+!
+interface vlan 878
+ip address 172.26.44.4 255.255.254.0
+no shutdown
+!
+exit
+vlan 879
+name 879-Stamping
+!
+interface vlan 879
+ip address 172.26.46.4 255.255.254.0
+no shutdown
+!
+exit
+vlan 880
+name 880-Assembly
+!
+interface vlan 880
+ip address 172.26.48.4 255.255.254.0
+no shutdown
+!
+exit
+vlan 881
+name 881-Vision-Systems
+!
+interface vlan 881
+ip address 172.26.38.4 255.255.254.0
+no shutdown
+!
+exit
+vlan 882
+name 882-Vision-Systems
+!
+interface vlan 882
+ip address 172.26.40.4 255.255.254.0
+no shutdown
+!
+exit
+vlan group 000-Busiess vlan-list 100
+!
+!
+wlan Business-Restricted 4 Business-Restricted
+ mac-filtering Business-Restricted
+ security wpa psk set-key ascii 0 idontdfsofjodfsoidoif
+ no security wpa akm dot1x
+ security wpa akm psk
+ security dot1x authentication-list Business-Restricted
+ no shutdown
+!
+wireless profile policy Business-Restricted
+ aaa-override
+ vlan Sinkhole
+ no shutdown
+!
+wireless tag policy MLXELI-Tag
+ wlan Business-Restricted policy Business-Restricted
+!
+snmp-server location Guadalajara, MX;  Main Data Center
+snmp-server contact KBS-Network Operations
+snmp-server group kgsnetworkteam v3 priv
+snmp-server group kgsnetworkteam v3 priv read v1default 
+snmp-server user kgsuser  kgsnetworkteam v3 auth sha vnIXW5wuV_yX priv aes 128 jwH_BUDjKYE2
+snmp-server group kgsnetwork v3 priv
+snmp-server group kgsnetworkwr v3 priv write v1default  access 31
+snmp-server user kgswruser  kgsnetworkwr v3 auth sha JEaVDNvNqTI_1 priv aes 128 AgnTcgObdZ_N4
+access-list 31 permit 10.0.0.0 0.255.255.255
+access-list 31 permit 146.209.0.0 0.0.255.255
+snmp-server group cxgroup v3 priv
+snmp-server group cxgroup v3 priv read v1default  
+snmp-server user mlxuser cxgroup v3 auth sha 6XWdvAFmPMZ_Gz priv aes 128 PgwWh_XwEX7VyX
+logging origin-id hostname
+logging trap notifications
+logging host 10.222.255.14
+logging buffered 512000
+no logging console
+!

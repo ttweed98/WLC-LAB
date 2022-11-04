@@ -6,7 +6,7 @@
 
   tasks:
     - name: "Testing host variables"
-      template: src=brestricted-vlans.j2 dest=brvlans.txt
+      template: src=std-vlans.j2 dest=std-vlans.txt
 
 
 

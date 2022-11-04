@@ -1,7 +1,4 @@
 hostname MLXELI-WLC01
-ntp server 10.1.10.13
-ntp server 10.159.12.29
-ntp source vlan 901
 
 vlan 901
 name Wireless_Management
@@ -41,12 +38,13 @@ interface G2
 description MLXELI-RXA1-G1/0/20
 switchport mode trunk
 channel-group 1 mode on
-interface G3
-description MLXELI-RXA1-G2/0/20
-switchport mode trunk
-channel-group 1 mode on
 interface po1
 description PortChannel to MLXELI-RXA1
 switchport mode trunk
 switchport nonegotiate
 exit
+!
+ntp server 10.1.10.13
+ntp server 10.159.12.29
+ntp source vlan 901
+!

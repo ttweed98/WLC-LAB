@@ -1,0 +1,70 @@
+---
+- name: "Push configuration to WLC"
+  hosts: wlc
+  gather_facts: false 
+  connection: network_cli
+
+  tasks: 
+    - name: "Pushing 1st inital static configuration to WLC"
+      cisco.ios.ios_config:
+        src: "wlc-config1.txt"
+      register: output
+
+    - name: "Pushing basic vlans and vlan interfaces to WLC"
+      cisco.ios.ios_config:
+        src: "std-vlans.j2"
+      register: output1
+
+    - name: "Pushing 2nd static configuration to WLC"
+      cisco.ios.ios_config:
+        src: "wlc-config2.txt"
+      register: output2
+
+    - name: "Pushing 3rd static configuration to WLC"
+      cisco.ios.ios_config:
+        src: "wlc-config4.txt"
+      register: output9
+
+    - name: "Pushing Radius Server configuration to WLC"
+      cisco.ios.ios_config:
+        src: "auth-servers.j2"
+      register: output3
+
+    - name: "Pushing Tacacs Server configuration to WLC"
+      cisco.ios.ios_config:
+        src: "tacacs-servers.j2"
+      register: output4
+
+    - name: "Pushing WLAN Policies to WLC"
+      cisco.ios.ios_config:
+        src: "wlan-policy.j2"
+      register: output5
+
+    - name: "Pushing SSIDs to WLC"
+      cisco.ios.ios_config:
+        src: "SSID.j2"
+      register: output6
+
+    - name: "Pushing Business Restricted to WLC"
+      cisco.ios.ios_config:
+        src: "brestricted-vlans.j2"
+      register: output7
+
+    - name: "Pushing SNMP configuration to WLC"
+      cisco.ios.ios_config:
+        src: "snmp.j2"
+      register: output8
+
+    - name: "print output"
+      debug:
+        msg: 
+          - "{{ output }}"
+          - "{{ output1 }}"
+          - "{{ output2 }}"
+          - "{{ output3 }}"
+          - "{{ output4 }}"     
+          - "{{ output5 }}" 
+          - "{{ output6 }}"
+          - "{{ output7 }}"  
+          - "{{ output8 }}"   
+          - "{{ output9 }}"                 

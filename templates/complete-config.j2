@@ -1,0 +1,327 @@
+vrf definition Mgmt-intf 
+!
+interface GigabitEthernet3
+ no switchport
+ vrf forwarding Mgmt-intf
+ ip address dhcp
+ negotiation auto
+no shut
+!
+username admin privilege 15 secret 5 $1$X46V$6KOYtMR68l1q2CE/..KvJ1
+!
+aaa new-model
+aaa authentication enable default none
+aaa common-criteria policy KGS
+ min-length 1
+ max-length 127
+ char-changes 4
+service password-encryption
+!
+ip http authentication local
+!
+interface vlan 1
+ shutdown
+!
+hostname {{ site_code }}-WLC{{ WLC_number }}
+
+{% for vl in std_vlans.vlan %}
+vlan {{ vl.number}}
+name {{ vl.name }}
+interface vlan {{ vl.number }}
+ip address {{ vl.svi }}
+no shutdown
+exit
+{% endfor %}
+
+interface vlan 999
+description bogon non-routeable
+exit
+ip route 0.0.0.0 0.0.0.0 {{ gateway }}
+interface vlan 1
+shutdown
+exit
+wireless management interface vlan {{ wlan_mgmt_intf }}
+
+{% for intf in interfaces %}
+interface {{ intf.interface }}
+description {{ intf.name }}
+switchport mode {{ intf.mode }}
+channel-group 1 mode on
+{% endfor %}
+interface po1
+description PortChannel to {{remote_hostname}}
+switchport mode trunk
+switchport nonegotiate
+exit
+!
+ntp server 10.1.10.13
+ntp server 10.159.12.29
+ntp source vlan {{ wlan_mgmt_intf }}
+!
+wireless profile policy Client_Policy
+ vlan Client_Vlan
+ no shutdown
+!
+!
+ip access-list extended ISE_REDIRECT
+10 deny   udp any any eq bootps log
+20 deny   udp any eq bootps any
+30 deny   udp any any eq domain
+40 deny   udp any eq domain any
+50 deny   tcp any any eq 8443
+60 deny   tcp any eq 8443 any
+70 permit ip any any
+!
+ap dot11 24ghz rf-profile Modified_DR_24
+ band-select client mid-rssi -75
+ band-select client rssi -75
+ band-select probe-response
+ description "Standard 2.4GHz profile with modified data rates and RRM"
+ rate RATE_11M disable
+ rate RATE_12M mandatory
+ rate RATE_1M disable
+ rate RATE_2M disable
+ rate RATE_5_5M disable
+ rate RATE_6M disable
+ rate RATE_9M disable
+ tx-power max 14
+ tx-power min 8
+ no shutdown
+!
+ap dot11 5ghz rf-profile Modified_DR_5
+ description "Standard RF profile with lower data rates removed"
+channel chan-width 20
+no channel foreign
+channel remove 36
+channel remove 144
+rate RATE_6M disable
+rate RATE_9M disable
+rate RATE_12M mandatory
+tx-power max 17
+tx-power min 8
+client-aware-fra
+no shutdown
+!
+wireless tag rf KGS-RF-TAG
+ 24ghz-rf-policy Modified_DR_24
+ 5ghz-rf-policy Modified_DR_5
+ description "Standard RF Tag using optimal RF Profiles"
+!
+
+
+!
+banner login ^
+##########################################################################
+# Unauthorized access of this device or any information or data received #
+# or sent by this device is prohibited. This device is monitored and per #
+# Koch Industries Electronic Communications Acceptable Usage Policy,     #
+# results can be used for any legal purpose.                             #
+##########################################################################
+^
+!
+line con 0
+ exec-timeout 60 0
+ transport preferred none
+ stopbits 1
+line aux 0
+ exec-timeout 60 0
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ exec-timeout 60 0
+ length 0
+ transport preferred none
+ transport input ssh
+logging synchronous
+line vty 5 15
+ exec-timeout 60 0
+ transport preferred none
+ transport input ssh
+logging synchronous
+!
+
+
+crypto key generate rsa general-keys label CryptoKey4SSH modulus 4096
+
+
+
+ip ssh time-out 60
+ip ssh version 2
+ip ssh authentication-retries 3
+!
+clock timezone CST -6 0
+clock summer-time CSDT recurring
+!
+no service pad
+service timestamps debug datetime localtime msec
+service timestamps log datetime localtime msec
+!
+service tcp-keepalives-in
+service tcp-keepalives-out 
+LLDP Run
+archive
+software auto-upgrade enable
+!
+ip domain lookup  
+ip domain name molex.com
+ip domain lookup source-interface 901
+errdisable recovery interval 300
+errdisable recovery cause all
+!
+aaa new-model
+radius-server dead-criteria time 15 tries 3
+radius-server deadtime 10
+radius-server load-balance method least-outstanding
+{% for srv in Radius.servers %}
+radius server {{ srv.server}}
+address ipv4 {{ srv.ip }} auth-port 1812 acct-port 1813
+key 0 {{ srv.key }}
+{% endfor %}
+aaa group server radius PROD
+{% for aaasrv in Radius.servers %}
+server name {{ aaasrv.server}}
+{% endfor %}
+aaa group server radius Web-auth
+{% for aaasrv in Radius.servers %}
+server name {{ aaasrv.server}}
+{% endfor %}
+aaa authentication dot1x CWA group Web-Auth
+aaa authorization network CWA group Web-Auth
+aaa authentication dot1x Business_802.1x group PROD
+!
+aaa new-model
+aaa authentication login default group tacacs+ local
+aaa authentication enable default group tacacs+ enable
+aaa authorization console
+aaa authorization exec default group tacacs+ local if-authenticated
+aaa authorization network default group tacacs+
+aaa accounting exec default start-stop group tacacs+
+aaa accounting commands 15 default start-stop group tacacs+
+!
+{% for srv in Tacacs.servers %}
+tacacs server {{ srv.server }}
+address ipv4 {{ srv.ip }}
+key 0 {{ srv.key }}
+!
+{% endfor %}
+aaa group server tacacs+ ISE
+{% for group in Tacacs.servers %}
+server name {{ group.server }}
+{% endfor %}
+!
+aaa authentication login ISE1 group ISE
+aaa authorization exec ISE2 group ISE
+no tacacs-server directed-request
+ip tacacs source-interface vlan {{ wlan_mgmt_intf }}
+!
+ip http authentication aaa login-authentication ISE1
+ip http authentication aaa exec-authorization ISE2
+ip http timeout-policy idle 600 life 86400 requests 86400
+ip http secure-server
+no ip http server
+!
+{% for pol in wireless.profile %}
+wireless profile policy {{ pol.policy }}
+ipv4 dhcp required
+aaa-override
+nac
+vlan 334-HIOT
+no shutdown
+!
+{% endfor %}
+!
+{% for wlans in wlan %}
+{% if wlans.profile == "Business" %}
+wlan {{ wlans.profile }} {{ wlans.id }} {{ wlans.ssid }}
+no chd
+security dot1x authentication-list Business_802.1x
+no shutdown
+exit
+{% else %}
+wlan {{ wlans.profile }} {{ wlans.id }} {{ wlans.ssid }}
+mac-filtering CWA
+no security wpa
+no security wpa wpa2 ciphers aes
+no security wpa akm dot1x
+security dot1x authentication-list CWA
+no shutdown
+exit
+{% endif %}
+{% endfor %}
+{% for wlans in wlan %}
+{% if wlans.profile == "Business" %}
+wireless tag policy {{ site_code }}-Tag
+wlan {{ wlans.profile }} policy Client_Policy
+exit
+{% endif %}
+{% if wlans.profile == "Koch-Guest" %}
+wireless tag policy {{ site_code }}-Tag
+wlan {{ wlans.profile }} policy Guest_Web_Auth
+exit
+{% endif %}
+{% if wlans.profile == "Koch-Personal" %}
+wireless tag policy {{ site_code }}-Tag
+wlan {{ wlans.profile }} policy Personal_Web_Auth
+exit
+{% endif %}
+{% endfor %}
+!
+aaa authentication dot1x Business-Restricted group PROD
+aaa authorization network Business-Restricted group PROD
+!
+{% for vl in b_restricted_vlans.vlan %}
+vlan {{ vl.number}}
+name {{ vl.name }}
+!
+interface vlan {{ vl.number }}
+ip address {{ vl.svi }}
+no shutdown
+!
+exit
+{% endfor %}
+vlan group 000-Busiess vlan-list {{ Client_Vlan }}
+!
+!
+wlan Business-Restricted 4 Business-Restricted
+ mac-filtering Business-Restricted
+ security wpa psk set-key ascii 0 idontdfsofjodfsoidoif
+ no security wpa akm dot1x
+ security wpa akm psk
+ security dot1x authentication-list Business-Restricted
+ no shutdown
+!
+wireless profile policy Business-Restricted
+ aaa-override
+ vlan Sinkhole
+ no shutdown
+!
+wireless tag policy {{ site_code }}-Tag
+ wlan Business-Restricted policy Business-Restricted
+!
+snmp-server location {{ snmp.location }}
+snmp-server contact KBS-Network Operations
+{% for srv in snmp.groups %}
+{% if srv.group == "kgsnetworkteam" %}
+snmp-server group {{ srv.group }} v3 priv
+snmp-server group kgsnetworkteam v3 priv read v1default 
+snmp-server user kgsuser  kgsnetworkteam v3 auth sha {{ srv.auth_pwd }} priv aes 128 {{srv.priv_pwd}}
+{% endif %}
+{% if srv.group == "kgsnetwork" %}
+snmp-server group {{ srv.group }} v3 priv
+snmp-server group {{ srv.group }}wr v3 priv write v1default  access 31
+snmp-server user kgswruser  {{ srv.group }}wr v3 auth sha {{ srv.auth_pwd }} priv aes 128 {{ srv.priv_pwd }}
+access-list 31 permit 10.0.0.0 0.255.255.255
+access-list 31 permit 146.209.0.0 0.0.255.255
+{% endif %}
+{% if srv.group == "cxgroup" %}
+snmp-server group {{ srv.group }} v3 priv
+snmp-server group {{ srv.group }} v3 priv read v1default  
+snmp-server user mlxuser {{ srv.group}} v3 auth sha {{ srv.auth_pwd}} priv aes 128 {{ srv.priv_pwd}}
+{% endif %}
+{% endfor %}
+logging origin-id hostname
+logging trap notifications
+logging host {{ logging_servers.USA }}
+logging buffered 512000
+no logging console
+!
