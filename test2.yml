@@ -7,7 +7,7 @@
   tasks: 
     - name: "Pushing test configs via Jinja"
       cisco.ios.ios_config:
-        src: "std-vlans.j2"
+        src: "snmp.j2"
       register: output1
        
 

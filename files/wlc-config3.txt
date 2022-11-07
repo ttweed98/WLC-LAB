@@ -1,0 +1,47 @@
+!
+wireless tag rf KGS-RF-TAG
+ 24ghz-rf-policy Modified_DR_24
+ 5ghz-rf-policy Modified_DR_5
+ description "Standard RF Tag using optimal RF Profiles"
+!
+crypto key generate rsa general-keys label CryptoKey4SSH modulus 4096
+
+
+ip ssh time-out 60
+ip ssh version 2
+ip ssh authentication-retries 3
+!
+clock timezone CST -6 0
+clock summer-time CSDT recurring
+!
+no service pad
+service timestamps debug datetime localtime msec
+service timestamps log datetime localtime msec
+!
+service tcp-keepalives-in
+service tcp-keepalives-out 
+LLDP Run
+
+!
+ip domain lookup  
+ip domain name molex.com
+errdisable recovery interval 300
+errdisable recovery cause all
+!
+!
+line con 0
+ exec-timeout 60 0
+ transport preferred none
+ stopbits 1
+line vty 0 4
+ exec-timeout 60 0
+ length 0
+ transport preferred none
+ transport input ssh
+ logging synchronous
+line vty 5 15
+ exec-timeout 60 0
+ transport preferred none
+ transport input ssh
+ logging synchronous
+!

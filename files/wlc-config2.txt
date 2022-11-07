@@ -1,0 +1,46 @@
+wireless profile policy Client_Policy
+vlan Client_Vlan
+no shutdown
+!
+!
+ip access-list extended ISE_REDIRECT
+10 deny   udp any any eq bootps log
+20 deny   udp any eq bootps any 
+30 deny   udp any any eq domain
+40 deny   udp any eq domain any
+50 deny   tcp any any eq 8443
+60 deny   tcp any eq 8443 any
+70 permit ip any any
+!
+ap dot11 24ghz rf-profile Modified_DR_24
+ shutdown
+ band-select client mid-rssi -75
+ band-select client rssi -75
+ band-select probe-response
+ description "Standard 2.4GHz profile with modified data rates and RRM"
+ rate RATE_11M disable
+ rate RATE_12M mandatory
+ rate RATE_1M disable
+ rate RATE_2M disable
+ rate RATE_5_5M disable
+ rate RATE_6M disable
+ rate RATE_9M disable
+ tx-power max 14
+ tx-power min 8
+ no shutdown
+!
+ap dot11 5ghz rf-profile Modified_DR_5
+ shutdown
+ description "Standard RF profile with lower data rates removed"
+channel chan-width 20
+no channel foreign
+channel remove 36
+channel remove 144
+rate RATE_6M disable
+rate RATE_9M disable
+rate RATE_12M mandatory
+tx-power max 17
+tx-power min 8
+client-aware-fra
+no shutdown
+!
