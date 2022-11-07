@@ -33,5 +33,5 @@ exit
 ntp server 10.1.10.13
 ntp server 10.159.12.29
 ntp source vlan {{ wlan_mgmt_intf }}
-ip domain lookup source-interface {{ wlan_mgmt_intf }}
+ip domain lookup source-interface Vlan {{ wlan_mgmt_intf }}
 !
