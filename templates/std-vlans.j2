@@ -1,4 +1,3 @@
-hostname {{ hostname }}
 
 {% for vl in std_vlans.vlan %}
 vlan {{ vl.number}}
@@ -9,6 +8,7 @@ no shutdown
 exit
 {% endfor %}
 
+hostname {{ hostname }}
 interface vlan 999
 description bogon non-routeable
 exit
