@@ -1,4 +1,4 @@
-
+hostname {{ hostname }}
 {% for vl in std_vlans.vlan %}
 vlan {{ vl.number}}
 name {{ vl.name }}
