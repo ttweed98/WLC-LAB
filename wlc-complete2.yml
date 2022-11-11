@@ -1,0 +1,84 @@
+---
+- name: "Push configuration to WLC"
+  hosts: wlc
+  gather_facts: false
+  connection: network_cli
+
+  tasks:
+    - name: "Pushing 1st inital static configuration to WLC"
+      cisco.ios.ios_config:
+        src: "files/wlc-config1.txt"
+      register: output
+
+    - name: "Configure MOTD"
+      cisco.ios.ios_banner:
+        banner: login
+        text: |
+          ##########################################################################
+          # Unauthorized access of this device or any information or data received #
+          # or sent by this device is prohibited. This device is monitored and per #
+          # Koch Industries Electronic Communications Acceptable Usage Policy,     #
+          # results can be used for any legal purpose.                             #
+          ##########################################################################
+        state: present
+      register: output1
+
+    - name: "Pushing basic vlans and vlan interfaces to WLC"
+      cisco.ios.ios_config:
+        src: "std-vlans.j2"
+      register: output2
+
+    - name: "Pushing 2nd static configuration to WLC"
+      cisco.ios.ios_config:
+        src: "files/wlc-config2.txt"
+      register: output3
+
+    - name: "Pushing 3rd static configuration to WLC"
+      cisco.ios.ios_config:
+        src: "files/wlc-config3.txt"
+      register: output4
+
+    - name: "Pushing Radius Server configuration to WLC"
+      cisco.ios.ios_config:
+        src: "auth-servers.j2"
+      register: output5
+
+    - name: "Pushing Tacacs Server configuration to WLC"
+      cisco.ios.ios_config:
+        src: "tacacs-servers.j2"
+      register: output6
+
+    - name: "Pushing WLAN Policies to WLC"
+      cisco.ios.ios_config:
+        src: "wlan-policy.j2"
+      register: output7
+
+    - name: "Pushing SSIDs to WLC"
+      cisco.ios.ios_config:
+        src: "SSID.j2"
+      register: output8
+
+    - name: "Pushing Business Restricted SSIDs to WLC"
+      cisco.ios.ios_config:
+        src: "brestricted-vlans.j2"
+      register: output9
+
+    - name: "Pushing SNMP configuration to WLC"
+      cisco.ios.ios_config:
+        src: "snmp.j2"
+      register: output10
+
+    - name: "print output"
+      debug:
+        msg:
+          - "{{ output }}"
+          - "{{ output1 }}"
+          - "{{ output2 }}"
+          - "{{ output3 }}"
+          - "{{ output4 }}"
+          - "{{ output5 }}"
+          - "{{ output6 }}"
+          - "{{ output7 }}"
+          - "{{ output8 }}"
+          - "{{ output9 }}"
+          - "{{ output10 }}"
