@@ -1,4 +1,5 @@
 hostname {{ remote_hostname }}
+wireless country {{ country_code }}
 {% for vl in std_vlans.vlan %}
 vlan {{ vl.number}}
 name {{ vl.name }}
